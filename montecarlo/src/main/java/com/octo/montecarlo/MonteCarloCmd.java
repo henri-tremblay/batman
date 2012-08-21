@@ -6,6 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MonteCarloCmd implements Runnable {
@@ -61,6 +62,8 @@ public class MonteCarloCmd implements Runnable {
 
     private static final AtomicReference<Step> stepRef = new AtomicReference<>();
 
+    private static AtomicInteger concurrencyCount = new AtomicInteger(0);
+
     private final MonteCarloCalculator calculator;
 
     public MonteCarloCmd(MonteCarloCalculator calculator) {
@@ -69,12 +72,14 @@ public class MonteCarloCmd implements Runnable {
 
     public static void main(String[] args) {
 
-        if (args.length != 1) {
+        if (args.length != 2) {
             usage("Algoritm not provided");
             return;
         }
 
         final String algoName = args[0];
+        final String algoType = args[1];
+
         final Constructor<MonteCarloCalculator> constructor = retrieveAlgorithm(algoName);
         // This instance is only used to get the variables specific to this calculator
         final MonteCarloCalculator calculator = instantiateAlgorithm(constructor, 0);
@@ -96,6 +101,7 @@ public class MonteCarloCmd implements Runnable {
                         if (stepRef.compareAndSet(s, updated)) {
                             break;
                         }
+                        concurrencyCount.incrementAndGet();
                     }
                 }
             }
@@ -108,30 +114,38 @@ public class MonteCarloCmd implements Runnable {
             public void run() {
                 Step step = stepRef.get();
                 double area = step.calculate(calculator.getFactor());
-                System.out.printf("%s = %1.10f on iteration %d%n", algoName, area, step.loops());
+                System.out.printf("%s = %1.10f on iteration %d with %d concurrent writes%n", algoName, area, step.loops(),
+                        concurrencyCount.get());
             }
         };
 
         Timer timer = new Timer("screen feedback", true);
         timer.scheduleAtFixedRate(taskPerformer, 1000, 1000);
 
-        //sequential(calculator);
-        parallel(constructor, listener);
+        long start = System.currentTimeMillis();
+        switch (algoType) {
+        case "sequential":
+            sequential(calculator);
+            break;
+        case "parallel":
+            parallel(constructor, listener);
+            break;
+        default:
+            usage("Unknown algorithm type. Should be parallel or sequential");
+            return;
+        }
+
+        long end = System.currentTimeMillis();
 
         Step step = stepRef.get();
         double area = step.calculate(calculator.getFactor());
-        System.out.printf("Final: %s = %1.10f on iteration %d%n", algoName, area, step.loops());
+        System.out.printf("Final: %s = %1.10f with %d iterations and %d concurrent writes in %d seconds%n", algoName, area,
+                step.loops(), concurrencyCount.get(), (end - start) / 1000);
     }
 
     private static void sequential(MonteCarloCalculator calculator) {
         stepRef.set(new Step(1));
-        ForkJoinPool pool = new ForkJoinPool();
-        pool.execute(new MonteCarloCmd(calculator));
-        try {
-            pool.awaitTermination(TIMEOUT, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        new MonteCarloCmd(calculator).run();
     }
 
     private static void parallel(Constructor<MonteCarloCalculator> constructor, MonteCarloListener listener) {
@@ -150,7 +164,7 @@ public class MonteCarloCmd implements Runnable {
     }
 
     @SuppressWarnings("unchecked")
-    private static Constructor<MonteCarloCalculator> retrieveAlgorithm(String prefix) {
+    protected static Constructor<MonteCarloCalculator> retrieveAlgorithm(String prefix) {
         String algo = MonteCarloGui.class.getPackage().getName() + "." + prefix + "MonteCarlo";
         Class<MonteCarloCalculator> algoClass;
         try {
@@ -167,7 +181,7 @@ public class MonteCarloCmd implements Runnable {
         }
     }
 
-    private static MonteCarloCalculator instantiateAlgorithm(Constructor<MonteCarloCalculator> cons, int index) {
+    protected static MonteCarloCalculator instantiateAlgorithm(Constructor<MonteCarloCalculator> cons, int index) {
         try {
             return cons.newInstance(index);
         } catch (ReflectiveOperationException e) {
@@ -175,8 +189,8 @@ public class MonteCarloCmd implements Runnable {
         }
     }
 
-    private static void usage(String message) {
-        System.err.printf("%s%n%nUsage: MonteCarloCmd Batman|Pi%n", message);
+    protected static void usage(String message) {
+        System.err.printf("%s%n%nUsage: MonteCarloCmd Batman|Pi sequential|parallel%n", message);
         System.exit(1);
         return;
     }
