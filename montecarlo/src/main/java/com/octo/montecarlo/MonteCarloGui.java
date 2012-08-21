@@ -178,7 +178,7 @@ public class MonteCarloGui implements Runnable {
             return null;
 		}
     }
-    
+
     private static MonteCarloCalculator instantiateAlgorithm(Constructor<MonteCarloCalculator> cons, int index) {
     	try {
             return cons.newInstance(index);
@@ -207,7 +207,7 @@ public class MonteCarloGui implements Runnable {
                 }
             }
             calculator.calculate();
-            if (SLEEP == 0 || ++i != 10) {
+            if (SLEEP == 0 || ++i != 100) {
                 continue;
             }
             try {
