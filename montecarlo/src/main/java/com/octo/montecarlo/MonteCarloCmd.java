@@ -58,7 +58,7 @@ public class MonteCarloCmd implements Runnable {
 
     private static final long CHECKPOINT = 1_000; // in ms
 
-    private static final long TIMEOUT = 30; // in seconds
+    private static final long TIMEOUT = 60; // in seconds
 
     private static final AtomicReference<Step> stepRef = new AtomicReference<>();
 
@@ -161,6 +161,7 @@ public class MonteCarloCmd implements Runnable {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        pool.shutdown();
     }
 
     @SuppressWarnings("unchecked")
