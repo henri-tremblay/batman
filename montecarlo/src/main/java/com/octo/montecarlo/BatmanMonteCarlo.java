@@ -14,7 +14,7 @@ public class BatmanMonteCarlo extends MonteCarloCalculator {
     private static final Dimension POSITION_OFFSET = new Dimension(800, 300);
 
     private static final double FACTOR = 4.0 * POSITIVE_RANGE.width * POSITIVE_RANGE.height;
-    
+
     // x^2/49+y^2/9-1<=0 and abs(x)>=4 and -(3 sqrt(33))/7<=y<=0 or abs(x)>=3 and y>=0 or -3<=y<=0 and -4<=x<=4 and (abs(x))/2+sqrt(1-(abs(abs(x)-2)-1)^2)-1/112 (3 sqrt(33)-7) x^2-y-3<=0 or y>=0 and 3/4<=abs(x)<=1 and -8 abs(x)-y+9>=0 or 1/2<=abs(x)<=3/4 and 3 abs(x)-y+3/4>=0 and y>=0 or abs(x)<=1/2 and y>=0 and 9/4-y>=0 or abs(x)>=1 and y>=0 and -(abs(x))/2-3/7 sqrt(10) sqrt(4-(abs(x)-1)^2)-y+(6 sqrt(10))/7+3/2>=0
     // A = 955/48-2/7 (-3 sqrt(10)+2 sqrt(33)+7 pi+3 sqrt(10) pi)+21 cos^(-1)(3/7)+21 cos^(-1)(4/7) = 48.4243
 
@@ -83,6 +83,7 @@ public class BatmanMonteCarlo extends MonteCarloCalculator {
         if (1.0 / 2.0 <= abs(x) && abs(x) <= 3.0 / 4.0 && 3.0 * abs(x) - y + 3.0 / 4.0 >= 0 && y >= 0) {
             return true;
         }
+        // Center square
         if (abs(x) <= 1.0 / 2.0 && y >= 0 && 9.0 / 4.0 - y >= 0) {
             return true;
         }
