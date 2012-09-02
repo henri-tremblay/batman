@@ -4,6 +4,7 @@ import static java.lang.Math.*;
 
 import java.awt.Dimension;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class BatmanMonteCarlo extends MonteCarloCalculator {
 
@@ -18,11 +19,14 @@ public class BatmanMonteCarlo extends MonteCarloCalculator {
     // x^2/49+y^2/9-1<=0 and abs(x)>=4 and -(3 sqrt(33))/7<=y<=0 or abs(x)>=3 and y>=0 or -3<=y<=0 and -4<=x<=4 and (abs(x))/2+sqrt(1-(abs(abs(x)-2)-1)^2)-1/112 (3 sqrt(33)-7) x^2-y-3<=0 or y>=0 and 3/4<=abs(x)<=1 and -8 abs(x)-y+9>=0 or 1/2<=abs(x)<=3/4 and 3 abs(x)-y+3/4>=0 and y>=0 or abs(x)<=1/2 and y>=0 and 9/4-y>=0 or abs(x)>=1 and y>=0 and -(abs(x))/2-3/7 sqrt(10) sqrt(4-(abs(x)-1)^2)-y+(6 sqrt(10))/7+3/2>=0
     // A = 955/48-2/7 (-3 sqrt(10)+2 sqrt(33)+7 pi+3 sqrt(10) pi)+21 cos^(-1)(3/7)+21 cos^(-1)(4/7) = 48.4243
 
+    /** Number of performed iterations */
     private long n = 0;
 
+    /** Number of "in" iterations */
     private long p = 0;
 
-    private Random rand = new Random();
+    /** Each calculator will run in a given thread. We improve performance by used a ThreadLocalRandom which impose no synchronization */
+    private Random rand = ThreadLocalRandom.current();
 
     public BatmanMonteCarlo(int index) {
     	super(index);
@@ -49,6 +53,7 @@ public class BatmanMonteCarlo extends MonteCarloCalculator {
         }
 
         listener.onPoint(x, y, good);
+        
         // statistically, we have p /n chances to be in the batman.
         // the square has an area of positive_range.width * positive_range.height * 4
         // so for 100% of the square, we have the full area
