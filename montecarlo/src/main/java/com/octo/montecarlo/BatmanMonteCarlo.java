@@ -88,7 +88,7 @@ public class BatmanMonteCarlo extends MonteCarloCalculator {
         if (1.0 / 2.0 <= abs(x) && abs(x) <= 3.0 / 4.0 && 3.0 * abs(x) - y + 3.0 / 4.0 >= 0 && y >= 0) {
             return true;
         }
-        // Center square
+        // Chest
         if (abs(x) <= 1.0 / 2.0 && y >= 0 && 9.0 / 4.0 - y >= 0) {
             return true;
         }
