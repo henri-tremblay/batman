@@ -8,12 +8,14 @@
 ant
 
 ##### Execute #####
-montecarlo.[bat|sh]
+Linux:
+java -cp montecarlo.jar:$APARAPI_HOME/aparapi.jar -Djava.library.path=$APARAPI_HOME -Dsize=256 -Diterations=20000 com.octo.montecarlo.Batman
 
-you can specify there three parameters in order
-first (com.amd.aparapi.executionMode): The execution mode. If empty, Aparapi will determine the best mode
-second (size): the number of kernels that will run on parallel
-third (iterations): the number of times the kernels will be called
+Windows:
+java -cp montecarlo.jar:%APARAPI_HOME%/aparapi.jar -Djava.library.path=%APARAPI_HOME% -Dsize=256 -Diterations=20000 com.octo.montecarlo.Batman
+
+size: the number of kernels that will run on parallel
+iterations: the number of times the kernels will be called
 
 the final number of iterations is size * iterations
    
