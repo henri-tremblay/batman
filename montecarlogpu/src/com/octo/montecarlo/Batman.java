@@ -22,7 +22,7 @@ public class Batman {
 
         int size;
 
-        int[] result;
+        long[] result;
 
         int[] seed;
         int[] temp;
@@ -86,7 +86,7 @@ public class Batman {
 
         public void init() {
 
-            result = new int[size];
+            result = new long[size];
             Arrays.fill(result, 0);
 
             seed = new int[size];
@@ -99,14 +99,14 @@ public class Batman {
             }
         }
 
-        public void showResult(int passes) {
-            int p = 0;
-            int n = size * passes;
+        public void showResult(long passes) {
+            long p = 0;
+            long n = size * passes;
             for (int i = 0; i < result.length; i++) {
                 p += result[i];
             }
             
-            float finalResult = 4.0f * width * height * p / n;
+            double finalResult = 4.0 * width * height * p / n;
             System.out.println("Final result: " + finalResult);
             System.out.println("Iterations: " + n);
         }
