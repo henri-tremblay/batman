@@ -24,7 +24,7 @@ public class MonteCarloGui implements Runnable {
 
     private static final Dimension SCREEN_DIMENSION = Toolkit.getDefaultToolkit().getScreenSize();
 
-    private static final int SLEEP = 1;
+    private static final int SLEEP = 10;
 
     private MonteCarloCalculator calculator;
 
